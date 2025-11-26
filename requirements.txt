@@ -1,6 +1,17 @@
+# Core dependencies
 numpy==2.2.6
 pandas==2.3.3
 python-dateutil==2.9.0.post0
 pytz==2025.2
 six==1.17.0
 tzdata==2025.2
+
+# Streamlit
+streamlit>=1.29.0
+
+# Machine Learning
+transformers>=4.35.0
+torch>=2.0.0
+
+# Visualization
+plotly>=5.18.0
