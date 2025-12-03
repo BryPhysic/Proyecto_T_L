@@ -63,4 +63,4 @@ output_en= mDeBERTa(patient_messages[0], triage_labels)
 print(output)
 print(output_en)
 
-print("bryan darwin luna bravo")
+print("bryan darwin luna bravo--")

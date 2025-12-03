@@ -91,6 +91,10 @@ TRANSLATIONS = {
         'what_is_this': '¿Qué es esto?',
         'ethics_title': 'Consideraciones Éticas',
         
+        # Sprint 2 NER
+        'abbreviations': 'Abreviaturas',
+        'results': 'Resultados',
+        
         # Placeholders
         'coming_soon': 'Próximamente - Esta funcionalidad está en desarrollo',
         'see_notebook': 'Ver notebook',
@@ -178,6 +182,10 @@ TRANSLATIONS = {
         'what_is_this': 'What is this?',
         'ethics_title': 'Ethical Considerations',
         
+        # Sprint 2 NER
+        'abbreviations': 'Abbreviations',
+        'results': 'Results',
+        
         # Placeholders
         'coming_soon': 'Coming Soon - This feature is under development',
         'see_notebook': 'See notebook',
@@ -234,7 +242,7 @@ def render_sidebar(translations: dict, lang: str):
         
         sprints = [
             {"num": 1, "icon": "🏥", "key": "sprint1_title", "status": "completed"},
-            {"num": 2, "icon": "🔖", "key": "sprint2_title", "status": "pending"},
+            {"num": 2, "icon": "🔖", "key": "sprint2_title", "status": "completed"},
             {"num": 3, "icon": "📝", "key": "sprint3_title", "status": "pending"},
             {"num": 4, "icon": "💬", "key": "sprint4_title", "status": "pending"},
         ]
