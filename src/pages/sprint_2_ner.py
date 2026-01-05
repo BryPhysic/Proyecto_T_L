@@ -66,10 +66,25 @@ def load_basic_models():
 
 
 @st.cache_resource
-def load_advanced_models():
-    """Load advanced NER models with EntityLinker (cached)."""
-    with st.spinner("⏳ Cargando EntityLinker con UMLS... (Primera vez: ~1GB, puede tardar 30-60 min)"):
-        processor = NERProcessor(load_advanced=True)
+def load_advanced_models(use_chromadb: bool = False):
+    """
+    Load advanced NER models with EntityLinker (cached).
+    
+    Args:
+        use_chromadb: If True, use ChromaDB (Low RAM). Else use scispacy Linker (High RAM).
+    """
+    if use_chromadb:
+        with st.spinner("⏳ Cargando NER con ChromaDB (Optimizado)..."):
+            # Path to ChromaDB - adjusting to relative path for stability
+            import os
+            base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            chroma_path = os.path.join(base_path, "Datasets", "chromadb_umls")
+            
+            processor = NERProcessor(load_advanced=True, use_chromadb=True, chromadb_path=chroma_path)
+    else:
+        with st.spinner("⏳ Cargando EntityLinker FULL (Puede tardar y usar mucha RAM)..."):
+            processor = NERProcessor(load_advanced=True, use_chromadb=False)
+            
     return processor
 
 
@@ -197,11 +212,19 @@ def render_advanced_results(resultados: Dict[str, Any], translations: dict):
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric(
-            "🗄️ Conceptos UMLS",
-            f"{resultados['metadatos']['total_conceptos_umls']:,}",
-            help="Total de conceptos médicos disponibles en UMLS"
-        )
+        # Only show total concepts if available (Legacy mode)
+        if 'total_conceptos_umls' in resultados['metadatos']:
+            st.metric(
+                "🗄️ Conceptos UMLS",
+                f"{resultados['metadatos']['total_conceptos_umls']:,}",
+                help="Total de conceptos médicos disponibles en UMLS"
+            )
+        else:
+            st.metric(
+                "🗄️ Modo",
+                resultados['metadatos'].get('modo', 'ChromaDB'),
+                help="Modo de procesamiento utilizado"
+            )
     
     with col2:
         total_entities = sum(resultados['estadisticas'].values())
@@ -334,22 +357,35 @@ def render(translations: dict, lang: str):
     st.markdown("---")
     
     # Mode selector
+    modo_opciones = {
+        'es': ["Básico", "Avanzado (ChromaDB)", "Avanzado (Legacy)"],
+        'en': ["Basic", "Advanced (ChromaDB)", "Advanced (Legacy)"]
+    }
+    
     modo = st.radio(
         "🎯 " + ("Modo de Procesamiento" if lang == 'es' else "Processing Mode"),
-        ["Básico", "Avanzado"] if lang == 'es' else ["Basic", "Advanced"],
+        modo_opciones[lang],
         horizontal=True,
-        help=("Básico: 3 modelos NER | Avanzado: + EntityLinker con UMLS" if lang == 'es' 
-              else "Basic: 3 NER models | Advanced: + EntityLinker with UMLS")
+        help=("ChromaDB: Rápido y ligero | Legacy: Lento y pesado (UMLS en RAM)" if lang == 'es' 
+              else "ChromaDB: Fast & Light | Legacy: Slow & Heavy (UMLS in RAM)")
     )
     
-    is_advanced = modo in ["Avanzado", "Advanced"]
+    is_advanced = "Avanzado" in modo or "Advanced" in modo
+    is_chromadb = "ChromaDB" in modo
+    is_legacy = "Legacy" in modo
     
-    # Warning for advanced mode
-    if is_advanced:
-        st.warning(
-            "⚠️ **Modo Avanzado**: La primera vez descargará UMLS (~1GB). Puede tardar 30-60 minutos." 
+    # Warings
+    if is_legacy:
+        st.error(
+            "⚠️ **Legacy Mode (High RAM)**: Carga 3.9M de conceptos en RAM (~15GB). Precaución." 
             if lang == 'es' 
-            else "⚠️ **Advanced Mode**: First time will download UMLS (~1GB). May take 30-60 minutes."
+            else "⚠️ **Legacy Mode (High RAM)**: Loads 3.9M concepts into RAM (~15GB). Caution."
+        )
+    elif is_chromadb:
+        st.success(
+            "⚡ **ChromaDB Mode**: Optimizado para bajo consumo de recursos (~1GB). Requiere indexación previa." 
+            if lang == 'es' 
+            else "⚡ **ChromaDB Mode**: Optimized for low resource usage (~1GB). Requires prior indexing."
         )
     
     # Input section
@@ -393,8 +429,13 @@ def render(translations: dict, lang: str):
         try:
             # Load appropriate models
             if is_advanced:
-                processor = load_advanced_models()
-                with st.spinner("⏳ " + ("Procesando con EntityLinker..." if lang == 'es' else "Processing with EntityLinker...")):
+                processor = load_advanced_models(use_chromadb=is_chromadb)
+                
+                msg = "Procesando con EntityLinker..." if is_legacy else "Busqueda semántica en ChromaDB..."
+                if lang != 'es':
+                    msg = "Processing with EntityLinker..." if is_legacy else "Semantic search in ChromaDB..."
+                    
+                with st.spinner("⏳ " + msg):
                     resultados = processor.procesar_avanzado(texto_clinico)
                 render_advanced_results(resultados, translations)
             else:

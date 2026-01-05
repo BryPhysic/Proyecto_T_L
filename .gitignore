@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Datasets y Bases de Datos (PESADOS - 12GB)
+Datasets/
+*.db
+*.sqlite
+*.sqlite3
+*.jsonl
+*.npz
+*.joblib
+*.bin
+
+# ChromaDB
+chromadb_umls/
+
+# Modelos de ML (pueden ser pesados)
+models/
+*.pt
+*.pth
+*.h5
+*.pkl
+*.pickle
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.out
+
+# Streamlit
+.streamlit/cache/
+.streamlit/secrets.toml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Gemini/Antigravity artifacts (opcional - descomentar si no quieres subirlos)
+# .gemini/
+
+# Environment variables
+.env
+.env.local
