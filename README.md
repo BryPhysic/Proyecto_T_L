@@ -1,126 +1,117 @@
 # 🏥 ACIE - Asistente Clínico Inteligente con Embeddings
 
-Sistema didáctico de NLP Médico desarrollado para el curso **Transformers en Salud** de la UPCH.
-
-## 📚 Módulos
-
-| Sprint | Nombre | Descripción |
-|--------|--------|-------------|
-| 1 | 🎯 Triaje Zero-Shot | Clasificación de urgencia sin entrenamiento |
-| 2 | 🔖 NER Médico | Extracción de entidades clínicas |
-| 3 | 📝 Generador SOAP | Notas clínicas estructuradas |
-| 4 | 💬 RAG Clínico | Preguntas sobre documentos médicos |
+Sistema de NLP Médico avanzado desarrollado para el curso **Transformers en Salud** de la UPCH. Este proyecto integra múltiples tecnologías de IA (Zero-Shot, NER, Generación de Texto, RAG) para asistir en distintas etapas del flujo de trabajo clínico.
 
 ---
 
-## 🚀 Instalación Rápida
+## 📚 Módulos del Proyecto (Sprints)
 
-### Requisitos
-- Python 3.10+
-- [Ollama](https://ollama.ai) (para Sprint 4)
-- 8GB RAM mínimo
+El sistema se compone de 5 módulos principales, diseñados para evaluar distintas competencias en IA aplicada a la salud:
 
-### Paso 1: Clonar repositorio
+| Sprint | Módulo | Descripción Técnica | Notebook Evidencia |
+| :--- | :--- | :--- | :--- |
+| **1** | 🎯 **Gestor de Triaje** | Clasificación **Zero-Shot** de urgencias médicas (mDeBERTa-v3). Clasifica mensajes de entrada sin entrenamiento previo. | `notebooks/01_triaje_zeroshot.ipynb` |
+| **2** | 🔖 **Estructurador de Datos** | Pipeline de **NER** (Named Entity Recognition) combinando HuggingFace y SciSpacy para extraer fármacos, dosis y enfermedades. | `notebooks/02_ner_basico.ipynb` |
+| **3** | 📝 **Redactor Seguro** | Generador de notas **SOAP** con mecanismos de Auto-Reflexión (Self-Correction) para auditar alucinaciones. | `notebooks/05_soap_generator.ipynb` |
+| **4** | 💬 **Consultor de Evidencia** | Sistema **RAG** (Retrieval-Augmented Generation) explicable. Utiliza BioMistral + PubMedBERT para responder dudas clínicas citando fuentes (PDFs). | `notebooks/04_rag_biomistral.ipynb` |
+| **5** | 🚀 **Despliegue Web (MVP)** | Integración final en una Web App interactiva con **Streamlit**. Unifica todos los módulos anteriores. | `src/streamlit_app.py` |
+
+---
+
+## 🚀 Instalación y Ejecución
+
+### Requisitos Previos
+- Python 3.10 o superior
+- [Ollama](https://ollama.ai) instalado (para ejecución local de modelos grandes en Sprint 3 y 4)
+- 8GB RAM mínimo (16GB recomendado)
+
+### 1. Clonar el Repositorio
 ```bash
 git clone https://github.com/BryPhysic/Proyecto_T_L.git
 cd Proyecto_T_L
 ```
 
-### Paso 2: Crear entorno virtual
+### 2. Configurar Entorno Virtual
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # macOS/Linux
-# o en Windows: .venv\Scripts\activate
+# O en Windows: .venv\Scripts\activate
 ```
 
-### Paso 3: Instalar dependencias
+### 3. Instalar Dependencias
 ```bash
 pip install -r requirements.txt
 ```
 
-### Paso 4: Instalar Ollama + Llama2 (para Sprint 4)
+### 4. Configurar Ollama (Modelos Locales)
+Para los módulos de Generación (Sprint 3) y RAG (Sprint 4) necesitarás los modelos base:
 ```bash
-# macOS
-brew install ollama
+# Instalar Ollama (si no lo tienes)
+brew install ollama  # macOS
 
-# Descargar modelo
+# Descargar modelos necesarios
 ollama pull llama2
+ollama pull meditron:7b  # Opcional, para mejor contexto médico
 ```
 
-### Paso 5: Ejecutar
+### 5. Iniciar la Aplicación Web
 ```bash
 streamlit run src/streamlit_app.py
 ```
-
-Abre http://localhost:8501 en tu navegador.
-
----
-
-## 📦 Modos de Uso
-
-### 🚀 Modo LITE (Recomendado para empezar)
-- ✅ **No requiere descargas adicionales**
-- ✅ Sube tus propios PDFs/TXTs
-- ✅ Funciona con Ollama local
-- Sprint 4: Solo busca en tus documentos
-
-### 📚 Modo COMPLETO (Con base de datos UMLS)
-1. Descarga `ACIE_datos_completos.zip` (~12GB) desde:
-   - [Link de Google Drive - pendiente]
-   
-2. Descomprime en la carpeta del proyecto:
-```bash
-unzip ACIE_datos_completos.zip -d Datasets/
-```
-
-3. En Sprint 4, selecciona "📚 Completo (UMLS)" para buscar también en la base de conocimiento médico.
+La aplicación se abrirá automáticamente en `http://localhost:8501`.
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📦 Características del Sistema
+
+### ✅ Modo LITE (Por defecto)
+- Funciona "out-of-the-box" sin configuraciones complejas.
+- Permite subir tus propios documentos (PDF/TXT) para el módulo RAG.
+- Usa modelos cuantizados para correr en hardware de consumo.
+
+### 📚 Base de Conocimiento (RAG)
+El sistema permite cargar Guías Clínicas y Protocolos en la carpeta `data/` o subirlos directamente desde la interfaz. El asistente usará estrictamente estos documentos para responder consultas, garantizando la trazabilidad.
+
+---
+
+## 📁 Estructura del Repositorio
 
 ```
 Proyecto_T_L/
 ├── src/
-│   ├── streamlit_app.py      # App principal
-│   ├── modules/              # Páginas de cada Sprint
-│   └── utils/                # Procesadores (NER, RAG, etc.)
-├── notebooks/                # Notebooks didácticos
-├── data/examples/            # Datos de ejemplo
-├── Datasets/                 # Bases de datos (no en GitHub)
-│   ├── chromadb_umls/        # Base UMLS (modo completo)
-│   └── rag_documents/        # Tus documentos
-└── requirements.txt          # Dependencias
+│   ├── streamlit_app.py      # 🏁 Punto de entrada de la Web App
+│   ├── modules/              # Lógica de cada página/sprint
+│   └── utils/                # Utilidades de procesamiento (NER, RAG, PDF loader)
+├── notebooks/                # 📓 Notebooks educativos (Evidencias de Evaluación)
+│   ├── 01_triaje_zeroshot.ipynb
+│   ├── 02_ner_basico.ipynb
+│   ├── 04_rag_biomistral.ipynb
+│   └── 05_soap_generator.ipynb
+├── data/                     # Carpeta para documentos de conocimiento
+└── requirements.txt          # Dependencias del proyecto
 ```
 
 ---
 
-## 🔧 Solución de Problemas
+## 🔧 Solución de Problemas Comunes
 
-### "Ollama no está corriendo"
+**1. Error "Ollama connection refused"**
+Asegúrate de que el servidor de Ollama esté corriendo en otra terminal:
 ```bash
-ollama serve  # Inicia el servidor
+ollama serve
 ```
 
-### "No encontré información relevante"
-- Sube un documento PDF/TXT primero
-- Haz preguntas relacionadas al contenido del documento
-
-### Sprint 4 muy lento
-- La primera respuesta tarda 1-2 min (carga del modelo)
-- Las siguientes son más rápidas
-- Usa "🔍 Solo Búsqueda" si no quieres esperar
+**2. Dependencias de Spacy/SciSpacy**
+Si tienes errores instalando `scispacy`, asegúrate de tener las herramientas de compilación de C++ instaladas (Xcode Command Line Tools en Mac).
 
 ---
 
-## 👥 Créditos
+## 👥 Créditos Académicos
 
-- **Curso**: Transformers en Salud - UPCH
-- **Versión**: 2.0 - Enero 2026
-- **Autor**: BryPhysic
+Desarrollado como Proyecto Final para el curso **Transformers del Lenguaje en Salud**.
+**Institución:** Universidad Peruana Cayetano Heredia (UPCH)
+
+**Año:** 2026
 
 ---
-
-## 📄 Licencia
-
-Uso educativo - UPCH
+⚠️ **Disclaimer:** Este software es una herramienta educativa y prototipo de investigación. NO debe utilizarse para toma de decisiones clínicas reales sin supervisión humana experta.

@@ -46,4 +46,4 @@ Ver `walkthrough.md` para instrucciones detalladas de uso.
 
 ## ⚠️ Importante
 
-Este sistema es una herramienta de apoyo educativa y NO reemplaza el juicio clínico profesional.
+Este sistema es una herramienta de apoyo educativa y NO reemplaza el juicio clínico profesional
